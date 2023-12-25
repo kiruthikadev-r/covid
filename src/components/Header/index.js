@@ -1,7 +1,7 @@
 import './index.css'
 
 const Header = () => (
-  <nav>
+  <nav className="navbar">
     <div>
       <img
         className="website-logo"
@@ -10,7 +10,7 @@ const Header = () => (
       />
     </div>
     <div>
-      <ul>
+      <ul className="listItems">
         <li className="home-text ">Home</li>
         <li className="about ">About</li>
       </ul>
