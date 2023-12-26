@@ -1,6 +1,7 @@
 import {Component} from 'react'
 import Loader from 'react-loader-spinner'
 import Charts from '../Charts'
+import StateItemCategory from '../StateItemCategory'
 
 //  This is the list (static data) used in the application. You can move it to any component if needed.
 
@@ -200,6 +201,7 @@ const healthOption = [
   },
 ]
 // Replace your code here
+
 class StateDetails extends Component {
   state = {
     category: categoriesList[0].id,
@@ -223,10 +225,8 @@ class StateDetails extends Component {
       apiStatus: apiStatusConstants.inProgress,
     })
     const {match} = this.props
-    console.log(match)
     const {params} = match
     const {stateCode} = params
-    console.log(stateCode)
     const apiUrl = 'https://apis.ccbp.in/covid19-state-wise-data'
 
     const response = await fetch(apiUrl)
@@ -239,9 +239,9 @@ class StateDetails extends Component {
         eachItem => eachItem.state_code === stateCode,
       )
       const totalStateData = data[stateCode].total
-      console.log(isStateCode)
       const stateName = isStateCode[0].state_name
       const newDate = new Date(data[stateCode].meta.last_updated)
+
       this.setState({
         totalState: totalStateData,
         listStateName: stateName,
@@ -263,8 +263,9 @@ class StateDetails extends Component {
     const {id, localStoreData, category} = this.state
     const listOfDistrict = localStoreData[id].districts
     const listOfDistrictName = Object.keys(listOfDistrict)
-    console.log(listOfDistrictName)
+
     const lowerCaseDis = category.toLowerCase()
+
     const dataElement = listOfDistrictName.map(eachItem => ({
       districtNameList: eachItem,
       districtValue: listOfDistrict[eachItem].total[lowerCaseDis]
@@ -294,10 +295,14 @@ class StateDetails extends Component {
     this.getTravels()
   }
 
+  clickedCategory = id => {
+    this.setState({category: id})
+  }
+
   districtName = () => {
     const {
       listStateName,
-      stateCode,
+      id,
       category,
       isStateCard,
       totalState,
@@ -319,6 +324,7 @@ class StateDetails extends Component {
       'Nov',
       'Dec',
     ]
+
     return (
       <div>
         <div>
@@ -339,15 +345,11 @@ class StateDetails extends Component {
         <div>
           <ul className="list-home">
             {healthOption.map(each => (
-              <li key={each.id} className={`list-item-home ${each.color}`}>
-                <p className={`list-item-text ${each.color}`}>{each.name}</p>
-                <img
-                  className={`list-item-image ${each.color}`}
-                  src={each.imageUrl}
-                  alt={each.name}
-                />
-                <p className={`list-item-count ${each.color}`}>{each.count}</p>
-              </li>
+              <StateItemCategory
+                each={each}
+                key={each.id}
+                clickedCategory={this.clickedCategory}
+              />
             ))}
           </ul>
           <div>
@@ -362,6 +364,9 @@ class StateDetails extends Component {
               </ul>
             </div>
           </div>
+        </div>
+        <div>
+          <Charts category={category} id={id} />
         </div>
       </div>
     )
