@@ -33,7 +33,8 @@ const apiStatusConstants = {
 
 class Charts extends Component {
   state = {
-    jobsList: [],
+    chartsList: [],
+    chartsO: [],
     apiStatus: apiStatusConstants.initial,
   }
 
@@ -90,82 +91,91 @@ class Charts extends Component {
     }
   }
 
-  renderLineChart = () => (
-    <div>
-      <h1>Line Chart</h1>
-      <div className="App">
-        <LineChart
-          width={730}
-          height={250}
-          data={data}
-          margin={{top: 5, right: 30, left: 20, bottom: 5}}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="count" stroke="#8884d8" />
-        </LineChart>
-      </div>
-    </div>
-  )
-
-  renderBarChart = () => {
-    const {chartsList} = this.state
+  renderLineChart = (cl, color) => {
+    const {chartsO} = this.state
+    console.log(color)
+    console.log(cl)
     return (
       <div>
-        <h1>Bar Chart</h1>
-        <div>
-          <BarChart width={800} height={450} data={chartsList}>
-            <CartesianGrid strokeDasharray="" />
-            <XAxis dataKey="date" />
+        <div className="App">
+          <LineChart
+            width={730}
+            height={250}
+            data={chartsO}
+            margin={{top: 5, right: 30, left: 20, bottom: 5}}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="eachDate"
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 500,
+                textTransform: 'uppercase',
+              }}
+              dy={5}
+            />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar
-              dataKey="count"
-              fill="#8884d8"
-              className="bar"
-              label={{position: 'top', color: 'white'}}
-            />
-          </BarChart>
+            <Line type="monotone" dataKey={cl} stroke={color} />
+          </LineChart>
         </div>
       </div>
     )
   }
 
-  renderFailureView = () => (
-    <div className="products-error-view-container">
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
-        alt="failure view"
-        className="products-failure-img"
-      />
-      <h1 className="product-failure-heading-text">
-        Oops! Something Went Wrong
-      </h1>
-      <p className="products-failure-description">
-        We could seem to find the page you are looking for.
-      </p>
-      <button type="button">Retry</button>
-    </div>
-  )
-
-  renderJobsListView = () => {
-    const {jobsList} = this.state
+  renderBarChart = () => {
+    const {chartsList} = this.state
+    const {category} = this.props
+    const barChart = category.toLowerCase()
+    const maxBarChart = chartsList.slice(Math.max(chartsList.length - 10, 0))
+    let barColor = '#9A0E31'
+    if (barChart === 'confirmed') {
+      barColor = '#9A0E31'
+    } else if (barChart === 'active') {
+      barColor = '#132240;'
+    } else if (barChart === 'recovered') {
+      barColor = '#182829'
+    } else if (barChart === 'deceased') {
+      barColor = '#1C1C2B'
+    }
 
     return (
-      <div className="no-products-view">
-        <img
-          src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
-          className="no-products-img"
-          alt="no jobs"
-        />
-        <h1 className="no-products-heading">No Jobs Found</h1>
-        <p className="no-products-description">
-          We could not find any jobs. Try other filters.
-        </p>
+      <div>
+        <div>
+          <BarChart
+            width={800}
+            height={450}
+            data={maxBarChart}
+            margin={{top: 5, right: 30, left: 20, botton: 5}}
+          >
+            <XAxis
+              dataKey="eachDate"
+              stroke={`${barColor}`}
+              interval={0}
+              axisLine={false}
+              fontSize={10}
+              tickLine={0}
+              strokeWidth={1}
+              style={{
+                fontWeight: 500,
+                fontFamily: 'Roboto',
+                textTransform: 'upperCase',
+              }}
+              dy={10}
+            />
+
+            <Tooltip />
+            <Legend />
+            <Bar
+              dataKey={barChart}
+              fill={`${barColor}`}
+              className="bar"
+              label={{position: 'top', fill: `${barColor}`, color: 'white'}}
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </div>
       </div>
     )
   }
@@ -191,10 +201,23 @@ class Charts extends Component {
     }
   }
 
+  renderGChart = () => (
+    <div>
+      <h1>Daily Spread Threads</h1>
+      <div>{this.renderLineChart('confirmed', '#9A0E31')}</div>
+      <div>{this.renderLineChart('active', '#132240')}</div>
+      <div>{this.renderLineChart('recovered', '#182829')}</div>
+      <div>{this.renderLineChart('deceased', '#1C1C2B')}</div>
+      <div>{this.renderLineChart('tested', '#230F41;')}</div>
+    </div>
+  )
+
   render() {
     return (
       <div>
-        {this.renderLineChart()} {this.renderBarChart()}
+        {this.renderBarChart()}
+
+        {this.renderGChart()}
       </div>
     )
   }
