@@ -28,11 +28,13 @@ class About extends Component {
     this.setState({
       apiStatus: apiStatusConstants.inProgress,
     })
-    const apiUrl = 'https://apis.ccbp.in/covid19-timelines-data/'
+    const apiUrl = 'https://apis.ccbp.in/covid19-faqs/'
 
     const response = await fetch(apiUrl)
+    console.log(response)
     if (response.ok) {
       const fetchedData = await response.json()
+      console.log(fetchedData)
       const updatedData = fetchedData.faq
       this.setState({
         travelList: updatedData,
@@ -64,6 +66,7 @@ class About extends Component {
 
   renderTravelListView = () => {
     const {travelList} = this.state
+    console.log(travelList)
 
     return (
       <div>
@@ -78,7 +81,7 @@ class About extends Component {
             </h1>
           </div>
 
-          <ul className="qs-and-ans">
+          <ul className="qs-and-ans" data-testid="faqsUnorderedList">
             {travelList.map(each => (
               <li key={each.qno}>
                 <p className="question">{each.question}</p>
@@ -107,7 +110,7 @@ class About extends Component {
   }
 
   renderLoadingView = () => (
-    <div className="products-loader-container" data-testid="loader">
+    <div className="products-loader-container" data-testid="aboutRouteLoader">
       <Loader type="ThreeDots" color="#0b69ff" height="50" width="50" />
     </div>
   )

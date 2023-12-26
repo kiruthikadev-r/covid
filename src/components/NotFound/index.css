@@ -1,0 +1,40 @@
+.not-found-container {
+  background: #161625;
+  background-size: cover;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.not-found-image {
+  fill: rgba(249, 248, 248, 0.1);
+  width: 448px;
+  height: 295.732px;
+  flex-shrink: 0;
+}
+
+.not-found-heading {
+  color: var(--Light-blue-gray-300, #cbd5e1);
+  text-align: center;
+  font-family: Roboto;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 48px; /* 150% */
+}
+
+.not-found-paragraph {
+  color: var(--Light-blue-gray-400, #94a3b8);
+  text-align: center;
+  font-family: Roboto;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px; /* 160% */
+}
+
+.not-found-button {
+  border-radius: 4px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;    
+}
