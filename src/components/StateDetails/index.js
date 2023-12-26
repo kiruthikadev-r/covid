@@ -1,7 +1,155 @@
 import {Component} from 'react'
 import Loader from 'react-loader-spinner'
+import Charts from '../Charts'
 
 //  This is the list (static data) used in the application. You can move it to any component if needed.
+
+const statesList = [
+  {
+    state_code: 'AN',
+    state_name: 'Andaman and Nicobar Islands',
+  },
+  {
+    state_code: 'AP',
+    state_name: 'Andhra Pradesh',
+  },
+  {
+    state_code: 'AR',
+    state_name: 'Arunachal Pradesh',
+  },
+  {
+    state_code: 'AS',
+    state_name: 'Assam',
+  },
+  {
+    state_code: 'BR',
+    state_name: 'Bihar',
+  },
+  {
+    state_code: 'CH',
+    state_name: 'Chandigarh',
+  },
+  {
+    state_code: 'CT',
+    state_name: 'Chhattisgarh',
+  },
+  {
+    state_code: 'DN',
+    state_name: 'Dadra and Nagar Haveli and Daman and Diu',
+  },
+  {
+    state_code: 'DL',
+    state_name: 'Delhi',
+  },
+  {
+    state_code: 'GA',
+    state_name: 'Goa',
+  },
+  {
+    state_code: 'GJ',
+    state_name: 'Gujarat',
+  },
+  {
+    state_code: 'HR',
+    state_name: 'Haryana',
+  },
+  {
+    state_code: 'HP',
+    state_name: 'Himachal Pradesh',
+  },
+  {
+    state_code: 'JK',
+    state_name: 'Jammu and Kashmir',
+  },
+  {
+    state_code: 'JH',
+    state_name: 'Jharkhand',
+  },
+  {
+    state_code: 'KA',
+    state_name: 'Karnataka',
+  },
+  {
+    state_code: 'KL',
+    state_name: 'Kerala',
+  },
+  {
+    state_code: 'LA',
+    state_name: 'Ladakh',
+  },
+  {
+    state_code: 'LD',
+    state_name: 'Lakshadweep',
+  },
+  {
+    state_code: 'MH',
+    state_name: 'Maharashtra',
+  },
+  {
+    state_code: 'MP',
+    state_name: 'Madhya Pradesh',
+  },
+  {
+    state_code: 'MN',
+    state_name: 'Manipur',
+  },
+  {
+    state_code: 'ML',
+    state_name: 'Meghalaya',
+  },
+  {
+    state_code: 'MZ',
+    state_name: 'Mizoram',
+  },
+  {
+    state_code: 'NL',
+    state_name: 'Nagaland',
+  },
+  {
+    state_code: 'OR',
+    state_name: 'Odisha',
+  },
+  {
+    state_code: 'PY',
+    state_name: 'Puducherry',
+  },
+  {
+    state_code: 'PB',
+    state_name: 'Punjab',
+  },
+  {
+    state_code: 'RJ',
+    state_name: 'Rajasthan',
+  },
+  {
+    state_code: 'SK',
+    state_name: 'Sikkim',
+  },
+  {
+    state_code: 'TN',
+    state_name: 'Tamil Nadu',
+  },
+  {
+    state_code: 'TG',
+    state_name: 'Telangana',
+  },
+  {
+    state_code: 'TR',
+    state_name: 'Tripura',
+  },
+  {
+    state_code: 'UP',
+    state_name: 'Uttar Pradesh',
+  },
+  {
+    state_code: 'UT',
+    state_name: 'Uttarakhand',
+  },
+  {
+    state_code: 'WB',
+    state_name: 'West Bengal',
+  },
+]
 
 const categoriesList = [
   {id: 'CONFIRMED', displayText: 'Confirmed'},
@@ -17,39 +165,91 @@ const apiStatusConstants = {
   inProgress: 'IN_PROGRESS',
 }
 
+const healthOption = [
+  {
+    id: 1,
+    name: 'Confirmed',
+    imageUrl:
+      'https://res.cloudinary.com/dk2gfawgg/image/upload/v1703433725/check-mark_1_ca6kt1.png',
+    count: '34285612',
+    color: 'red',
+  },
+  {
+    id: 2,
+    name: 'Active',
+    imageUrl:
+      'https://res.cloudinary.com/dk2gfawgg/image/upload/v1703433861/protection_1_rrgqll.png',
+    count: '165803',
+    color: 'blue',
+  },
+  {
+    id: 3,
+    name: 'Recovered',
+    imageUrl:
+      'https://res.cloudinary.com/dk2gfawgg/image/upload/v1703433980/recovered_1_qnr25o.png',
+    count: '33661339',
+    color: 'green',
+  },
+  {
+    id: 4,
+    name: 'Deceased',
+    imageUrl:
+      'https://res.cloudinary.com/dk2gfawgg/image/upload/v1703433916/breathing_1_dvanat.png',
+    count: '458470',
+    color: 'black',
+  },
+]
 // Replace your code here
 class StateDetails extends Component {
   state = {
-    activeId: categoriesList[0].id,
+    category: categoriesList[0].id,
     apiStatus: apiStatusConstants.initial,
-    travelList: [],
+    totalState: [],
+    totalTested: 0,
+    listStateName: '',
+    stateCode: '',
+    stateDate: '',
+    localStoreData: [],
+    id: '',
+    isStateCard: true,
   }
 
   componentDidMount() {
-    this.getTravels()
+    this.districtData()
   }
 
-  getTravels = async () => {
+  districtData = async () => {
     this.setState({
       apiStatus: apiStatusConstants.inProgress,
     })
     const {match} = this.props
+    console.log(match)
     const {params} = match
-    const {id} = params
-    const apiUrl = 'https://apis.ccbp.in/covid19-timelines-data/'
+    const {stateCode} = params
+    console.log(stateCode)
+    const apiUrl = 'https://apis.ccbp.in/covid19-state-wise-data'
 
-    const response = await fetch(`${apiUrl}${id}`)
-    console.log(response)
+    const response = await fetch(apiUrl)
+
     if (response.ok) {
-      const fetchedData = await response.json()
-      console.log(fetchedData)
-      const updatedData = fetchedData.projects.map(travel => ({
-        id: travel.id,
-        name: travel.name,
-        imageUrl: travel.image_url,
-      }))
+      const data = await response.json()
+
+      const stateTested = data[stateCode].total.tested
+      const isStateCode = statesList.filter(
+        eachItem => eachItem.state_code === stateCode,
+      )
+      const totalStateData = data[stateCode].total
+      console.log(isStateCode)
+      const stateName = isStateCode[0].state_name
+      const newDate = new Date(data[stateCode].meta.last_updated)
       this.setState({
-        travelList: updatedData,
+        totalState: totalStateData,
+        listStateName: stateName,
+        stateDate: newDate,
+        localStoreData: data,
+        id: stateCode,
+        stateCode,
+        totalTested: stateTested,
         apiStatus: apiStatusConstants.success,
       })
     } else {
@@ -59,8 +259,112 @@ class StateDetails extends Component {
     }
   }
 
+  stateData = () => {
+    const {id, localStoreData, category} = this.state
+    const listOfDistrict = localStoreData[id].districts
+    const listOfDistrictName = Object.keys(listOfDistrict)
+    console.log(listOfDistrictName)
+    const lowerCaseDis = category.toLowerCase()
+    const dataElement = listOfDistrictName.map(eachItem => ({
+      districtNameList: eachItem,
+      districtValue: listOfDistrict[eachItem].total[lowerCaseDis]
+        ? listOfDistrict[eachItem].total[lowerCaseDis]
+        : 0,
+    }))
+    dataElement.sort((a, b) => b.districtValue - a.districtValue)
+    const stateActiveCase = listOfDistrictName.map(eachItem => ({
+      districtNameList: eachItem,
+      districtValue:
+        listOfDistrict[eachItem].total.confirmed -
+        (listOfDistrict[eachItem].total.recovered +
+          listOfDistrict[eachItem].total.deceased)
+          ? listOfDistrict[eachItem].total.confirmed -
+            (listOfDistrict[eachItem].total.deceased +
+              listOfDistrict[eachItem].total.recovered)
+          : 0,
+    }))
+    stateActiveCase.sort((a, b) => b.districtValue - a.districtValue)
+    if (lowerCaseDis === 'active') {
+      return stateActiveCase
+    }
+    return dataElement
+  }
+
   retryClicked = () => {
     this.getTravels()
+  }
+
+  districtName = () => {
+    const {
+      listStateName,
+      stateCode,
+      category,
+      isStateCard,
+      totalState,
+      totalTested,
+      stateDate,
+    } = this.state
+    const topDistricts = this.stateData()
+    const months = [
+      'Jan',
+      'Feb',
+      'March',
+      'April',
+      'May',
+      'June',
+      'JUly',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ]
+    return (
+      <div>
+        <div>
+          <h1>{listStateName}</h1>
+          <div>
+            <p>Tested</p>
+            <p>{totalTested}</p>
+          </div>
+        </div>
+        <div>
+          <p>{`Last update on ${
+            months[stateDate.getMonth()]
+          } ${stateDate.getDate()} ${stateDate.getFullYear()}.`}</p>
+        </div>
+        <div>
+          <p>list</p>
+        </div>
+        <div>
+          <ul className="list-home">
+            {healthOption.map(each => (
+              <li key={each.id} className={`list-item-home ${each.color}`}>
+                <p className={`list-item-text ${each.color}`}>{each.name}</p>
+                <img
+                  className={`list-item-image ${each.color}`}
+                  src={each.imageUrl}
+                  alt={each.name}
+                />
+                <p className={`list-item-count ${each.color}`}>{each.count}</p>
+              </li>
+            ))}
+          </ul>
+          <div>
+            <div>
+              <ul>
+                {topDistricts.map(each => (
+                  <li key={each.districtNameList}>
+                    <p>{each.districtValue}</p>
+                    <p>{each.districtNameList}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   renderFailureView = () => (
@@ -82,25 +386,6 @@ class StateDetails extends Component {
     </div>
   )
 
-  renderTravelListView = () => {
-    const {travelList} = this.state
-
-    return (
-      <div className="all-products-container">
-        <h1>Travel Guide</h1>
-        <ul className="products-list">
-          {travelList.map(each => (
-            <li key={each.id}>
-              <img src={each.imageUrl} alt={each.name} />
-              <p>{each.name}</p>
-              <p>{each.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )
-  }
-
   renderLoadingView = () => (
     <div className="products-loader-container" data-testid="loader">
       <Loader type="ThreeDots" color="#0b69ff" height="50" width="50" />
@@ -112,7 +397,7 @@ class StateDetails extends Component {
 
     switch (apiStatus) {
       case apiStatusConstants.success:
-        return this.renderTravelListView()
+        return this.districtName()
       case apiStatusConstants.failure:
         return this.renderFailureView()
       case apiStatusConstants.inProgress:
@@ -127,19 +412,8 @@ class StateDetails extends Component {
   }
 
   render() {
-    const {activeId} = this.state
-
     return (
       <div>
-        <img
-          src="https://assets.ccbp.in/frontend/react-js/projects-showcase/website-logo-img.png"
-          alt="website logo"
-        />
-        <select value={activeId} onChange={this.selectedTag}>
-          {categoriesList.map(each => (
-            <option value={each.id}>{each.displayText}</option>
-          ))}
-        </select>
         <div className="all-products-section">{this.renderAllJobs()}</div>
       </div>
     )
