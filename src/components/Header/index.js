@@ -4,22 +4,26 @@ import './index.css'
 const Header = () => (
   <nav className="navbar">
     <div>
+      {' '}
+      <Link to="/">
+        <h1>COVID19INDIA</h1>
+      </Link>
       <ul className="listItems" data-testid="faqsUnorderedList">
-        <li>
-          <Link to="/">
-            <h1>COVID19INDIA</h1>
-          </Link>
-        </li>
-        <li className="home-text ">
-          <Link to="/">
+        <Link to="/">
+          <li className="home-text ">
             <button type="button">Home</button>
-          </Link>
-        </li>{' '}
-        <li className="about ">
-          <Link to="/about">
+          </li>
+        </Link>
+        <Link to="/about">
+          <li className="about ">
             <button type="button">About</button>
-          </Link>
-        </li>
+          </li>
+        </Link>{' '}
+        <Link to="/">
+          <li>
+            <p>Exit</p>
+          </li>
+        </Link>
       </ul>
     </div>
   </nav>

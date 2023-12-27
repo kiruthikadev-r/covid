@@ -1,11 +1,12 @@
 import {Component} from 'react'
 import {Link} from 'react-router-dom'
-import {BsFilterRight, BsFilterLeft} from 'react-icons/bs'
+import {FcGenericSortingDesc, FcGenericSortingAsc} from 'react-icons/fc'
 import {BiChevronRightSquare} from 'react-icons/bi'
-import {FiInstagram} from 'react-icons/fi'
-import {FaSearch, FaTwitter} from 'react-icons/fa'
-import {VscGithubAlt} from 'react-icons/vsc'
+
+import {BsSearch} from 'react-icons/bs'
+
 import Loader from 'react-loader-spinner'
+import Footer from '../Footer'
 
 import Header from '../Header'
 import './index.css'
@@ -200,7 +201,7 @@ const constantActive = {
 
 class Home extends Component {
   state = {
-    productSts: constantActive.initial,
+    isLoading: true,
     searchInput: '',
     covidList: [],
     isActive: false,
@@ -211,7 +212,7 @@ class Home extends Component {
   }
 
   getProducts = async () => {
-    this.setState({productSts: constantActive.initial})
+    this.setState({isLoading: true})
     const url = 'https://apis.ccbp.in/covid19-state-wise-data'
     const response = await fetch(url)
 
@@ -235,7 +236,7 @@ class Home extends Component {
         }
       })
 
-      this.setState({covidList: extractedData})
+      this.setState({covidList: extractedData, isLoading: false})
 
       // Remove null values from the array
     } else {
@@ -244,18 +245,8 @@ class Home extends Component {
   }
 
   loaderMethod = () => (
-    <div data-testid="loader">
+    <div data-testid="homeRouteLoader">
       <Loader type="ThreeDots" color="#0284c7" height={80} width={80} />
-    </div>
-  )
-
-  failureMethod = () => (
-    <div>
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/api-failure-view.png"
-        alt="failure view"
-      />
-      <h1>Something Went Wrong</h1>
     </div>
   )
 
@@ -263,8 +254,92 @@ class Home extends Component {
     this.setState({searchInput: event.target.value, isActive: true})
   }
 
+  renderingData = () => {
+    const {isActive, covidList} = this.state
+    return (
+      !isActive && (
+        <div>
+          <div>
+            <ul className="list-home">
+              {healthOption.map(each => (
+                <li key={each.id} className={`list-item-home ${each.color}`}>
+                  <p className={`list-item-text ${each.color}`}>{each.name}</p>
+                  <img
+                    className={`list-item-image ${each.color}`}
+                    src={each.imageUrl}
+                    alt={each.name}
+                  />
+                  <p className={`list-item-count ${each.color}`}>
+                    {each.count}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="list-box-container">
+            <div
+              className="list-box-container-two"
+              data-testid="stateWiseCovidDataTable"
+            >
+              <ul className="list-box" data-testid="stateWiseCovidDataTable">
+                <li
+                  className="list-confirmed"
+                  data-testid="stateWiseCovidDataTable"
+                >
+                  <p className="list-text state-text">States/UT</p>
+                  <FcGenericSortingAsc className="filter-icon" />
+                  <button
+                    aria-label="btn"
+                    type="button"
+                    data-testid="ascendingSort"
+                  >
+                    <FcGenericSortingDesc />
+                  </button>
+                </li>
+                <li>
+                  <p className="list-text">Confirmed</p>
+                </li>
+                <li>
+                  <p className="list-text">Active</p>
+                </li>
+                <li>
+                  <p className="list-text">Recovered</p>
+                </li>
+                <li>
+                  <p className="list-text">Deceased</p>
+                </li>
+                <li className="list-text">
+                  <p>Population</p>
+                </li>
+              </ul>
+              <hr />
+              <ul>
+                {covidList.map(each => (
+                  <Link to={`/states/${each.stateCode}`}>
+                    <li key={each.stateCode} className="list-item-api">
+                      <h1 className="state-name">{each.stateName}</h1>
+                      <p className="api-item red">{each.confirmedD}</p>
+                      <p className="api-item blue">{each.activeD}</p>
+                      <p className="api-item green">{each.recoveredD}</p>
+                      <p className="api-item black">{each.deceasedD}</p>
+                      <p className="api-item black population">
+                        {each.populationD}
+                      </p>
+                    </li>
+                  </Link>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      )
+    )
+  }
+
   render() {
-    const {searchInput, covidList, isActive} = this.state
+    const {searchInput, covidList, isActive, isLoading} = this.state
     const filteredList = covidList.filter(eachItem =>
       eachItem.stateName.toLowerCase().includes(searchInput.toLowerCase()),
     )
@@ -276,7 +351,7 @@ class Home extends Component {
         <div className="home">
           <div className="first-input-container">
             <div className="input-container">
-              <FaSearch size={20} className="search-icon" />
+              <BsSearch size={20} className="search-icon" />
               <input
                 className="input"
                 type="search"
@@ -286,103 +361,20 @@ class Home extends Component {
               />
             </div>
           </div>
-          {!isActive && (
-            <div>
-              <div>
-                <ul className="list-home">
-                  {healthOption.map(each => (
-                    <li
-                      key={each.id}
-                      className={`list-item-home ${each.color}`}
-                    >
-                      <p className={`list-item-text ${each.color}`}>
-                        {each.name}
-                      </p>
-                      <img
-                        className={`list-item-image ${each.color}`}
-                        src={each.imageUrl}
-                        alt={each.name}
-                      />
-                      <p className={`list-item-count ${each.color}`}>
-                        {each.count}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="list-box-container">
-                <div className="list-box-container-two">
-                  <ul className="list-box">
-                    <li className="list-confirmed">
-                      <p className="list-text state-text">States/UT</p>
-                      <BsFilterLeft className="filter-icon" />
-                      <BsFilterRight className="filter-icon" />
-                    </li>
-                    <li>
-                      <p className="list-text">Confirmed</p>
-                    </li>
-                    <li>
-                      <p className="list-text">Active</p>
-                    </li>
-                    <li>
-                      <p className="list-text">Recovered</p>
-                    </li>
-                    <li>
-                      <p className="list-text">Deceased</p>
-                    </li>
-                    <li className="list-text">
-                      <p>Population</p>
-                    </li>
-                  </ul>
-                  <hr />
-                  <ul>
-                    {covidList.map(each => (
-                      <li key={each.stateCode} className="list-item-api">
-                        <h1 className="state-name">{each.stateName}</h1>
-                        <p className="api-item red">{each.confirmedD}</p>
-                        <p className="api-item blue">{each.activeD}</p>
-                        <p className="api-item green">{each.recoveredD}</p>
-                        <p className="api-item black">{each.deceasedD}</p>
-                        <p className="api-item black population">
-                          {each.populationD}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="down-container-home">
-                <img
-                  className="home-down-img"
-                  src="https://res.cloudinary.com/dk2gfawgg/image/upload/v1703428770/COVID19INDIA_cmn8e5.png"
-                  alt="website-logo"
-                />
-                <p className="down-para">
-                  we stand with everyone fighting on the front lines
-                </p>
-                <div className="down-icons">
-                  <FiInstagram className="home-down-icon" />
-                  <FaTwitter className="home-down-icon" />
-                  <VscGithubAlt className="home-down-icon" />
-                </div>
-              </div>
-            </div>
-          )}
-
+          {isLoading ? this.loaderMethod() : this.renderingData()}
           {isActive && (
             <div>
-              <ul>
+              <ul data-testid="searchResultsUnorderedList">
                 {filteredList.map(each => (
-                  <li>
-                    <p>{each.stateName}</p>
-                    <div>
-                      <p>{each.stateCode}</p>
-                      <Link to={`/states/${each.stateCode}`}>
+                  <Link to={`/states/${each.stateCode}`}>
+                    <li>
+                      <p>{each.stateName}</p>
+                      <div>
+                        <p>{each.stateCode}</p>
                         <BiChevronRightSquare />
-                      </Link>
-                    </div>
-                  </li>
+                      </div>
+                    </li>
+                  </Link>
                 ))}
               </ul>
             </div>
